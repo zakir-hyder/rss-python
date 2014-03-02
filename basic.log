@@ -1,0 +1,55 @@
+2014-03-02 18:44:29,998 init
+2014-03-02 18:44:29,998 list index out of range
+2014-03-02 18:44:30,000 ftp username or passowrd or url is not correcr
+2014-03-02 18:44:30,000 [Errno 8] nodename nor servname provided, or not known
+2014-03-02 18:44:30,000 ftp username or passowrd or url is not correcr
+2014-03-02 18:45:00,863 init
+2014-03-02 18:45:01,562 ftp username or passowrd or url is not correcr
+2014-03-02 18:45:01,563 530 This FTP server is anonymous only.
+2014-03-02 18:45:01,563 ftp username or passowrd or url is not correcr
+2014-03-02 18:45:25,037 init
+2014-03-02 18:45:25,038 list index out of range
+2014-03-02 18:45:25,038 3ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss
+2014-03-02 18:45:25,038 list index out of range
+2014-03-02 18:45:25,038 3ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss
+2014-03-02 18:47:04,883 init
+2014-03-02 18:47:04,883 list index out of range
+2014-03-02 18:47:04,884 3ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss
+2014-03-02 18:47:04,884 list index out of range
+2014-03-02 18:47:04,884 3ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss
+2014-03-02 18:47:12,930 init
+2014-03-02 18:47:12,930 list index out of range
+2014-03-02 18:47:18,035 init
+2014-03-02 18:48:39,076 init
+2014-03-02 18:48:40,372 ftp username or passowrd or url is not correcr
+2014-03-02 18:48:40,372 530 This FTP server is anonymous only.
+2014-03-02 18:48:40,372 ftp username or passowrd or url is not correcr
+2014-03-02 18:48:43,546 init
+2014-03-02 18:48:43,546 list index out of range
+2014-03-02 18:48:44,284 ftp username or passowrd or url is not correcr
+2014-03-02 18:48:44,284 530 This FTP server is anonymous only.
+2014-03-02 18:48:44,284 ftp username or passowrd or url is not correcr
+2014-03-02 18:49:13,404 init
+2014-03-02 18:49:13,405 list index out of range
+2014-03-02 18:49:14,073 ftp username or passowrd or url is not correcr
+2014-03-02 18:49:14,073 530 This FTP server is anonymous only.
+2014-03-02 18:49:14,073 ftp username or passowrd or url is not correcr
+2014-03-02 18:50:14,761 init
+2014-03-02 18:50:14,761 list index out of range
+2014-03-02 18:50:16,008 ftp username or passowrd or url is not correcr
+2014-03-02 18:50:16,008 530 This FTP server is anonymous only.
+2014-03-02 18:50:16,009 ftp username or passowrd or url is not correcr
+2014-03-02 18:50:31,538 init
+2014-03-02 18:50:31,538 list index out of range
+2014-03-02 18:50:32,342 ftp username or passowrd or url is not correcr
+2014-03-02 18:50:32,342 530 This FTP server is anonymous only.
+2014-03-02 18:50:32,343 ftp username or passowrd or url is not correcr
+2014-03-02 18:50:47,329 init
+2014-03-02 18:50:47,329 list index out of range
+2014-03-02 18:50:48,391 ftp username or passowrd or url is not correcr
+2014-03-02 18:50:48,391 530 This FTP server is anonymous only.
+2014-03-02 18:50:48,391 ftp username or passowrd or url is not correcr
+2014-03-02 18:50:54,920 init
+2014-03-02 18:50:54,921 list index out of range
+2014-03-02 18:50:59,045 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 18:50:59,045 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss

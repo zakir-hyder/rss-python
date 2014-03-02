@@ -56,9 +56,6 @@ class HttpDownload():
 
 
 class FtpDownload():
-	def __init__(self):
-		print 'ftp class'
-
 	def ftp_connect(self, host, password, user, path = '/'):
 		link = FTP(host = host, timeout = 5)
 		if (user and password):
@@ -76,7 +73,6 @@ class FtpDownload():
 			msg = '1ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss'
 			logger.info(msg)
 			logger.info(ex)
-			print '111111'
 			return msg
 
 		try:
@@ -89,23 +85,15 @@ class FtpDownload():
 
 		try:	
 		  ftp_path_array = url_parsed.path.split('/')
-		  print ftp_path_array
-		  print 1
 		  ftp_url = ftp_url_details[len(ftp_user_detail)-1]
-		  print ftp_url
-		  print 2
 		  ftp_file_name = ftp_path_array[len(ftp_path_array) - 1]
-		  print ftp_file_name
-		  print 3
 		  ftp_path = url_parsed.path.replace(ftp_file_name, '')
-		  print ftp_path
-		  print 4
 		except Exception as ex:
 			msg = '3ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss'
 			logger.info(msg)
 			logger.info(ex)
 			return msg
-		print '===='	
+
 		try:
 			link = self.ftp_connect(host = ftp_url, password = ftp_pass, user = ftp_user, path = ftp_path)
 		except Exception as ex:
@@ -141,7 +129,6 @@ class FtpDownload():
 		return msg		
 
 class Downloader:
-
 	def __init__(self, url, logger):
 		self.logger = logger
 		self.url = url
@@ -158,9 +145,10 @@ class Downloader:
 		msg = self.downloader.download(self.url, self.url_parsed, self.safe_file_name(), download_folder, self.logger)	
 		self.logger.info(msg)
 
+
+
 logging.basicConfig(format='%(asctime)s %(message)s', filename='basic.log',level=logging.INFO)
 logger = logging.getLogger('log')
-
 logger.info('init')
 
 try:
@@ -178,7 +166,6 @@ for opt, arg in opts:
 	elif opt in ('--output'):
 		download_folder = arg	
 
-
 if not os.path.exists(download_folder):
 	try:
 	  os.makedirs(download_folder)
@@ -187,9 +174,6 @@ if not os.path.exists(download_folder):
 	  	logger.info('Can not create download folder ' + download_folder)
 	  	print 'Can not create download folder ' + download_folder
 	  	sys.exit(1)
-print '============'
 
 base = Downloader(url, logger)
-
 base.download(download_folder)
-exit(0);

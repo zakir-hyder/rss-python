@@ -53,3 +53,27 @@
 2014-03-02 18:50:54,921 list index out of range
 2014-03-02 18:50:59,045 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
 2014-03-02 18:50:59,045 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:05:38,169 init
+2014-03-02 19:05:38,170 list index out of range
+2014-03-02 19:05:43,381 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:05:43,381 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:20:35,130 init
+2014-03-02 19:20:35,130 [('--feed', 'ftp://ftp.debian.org/debian/README.mirrors.txt')]
+2014-03-02 19:20:35,130 list index out of range
+2014-03-02 19:20:48,878 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:20:48,879 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:22:10,472 init
+2014-03-02 19:22:10,473 feed url is ftp://ftp.debian.org/debian/README.mirrors.txt
+2014-03-02 19:22:10,473 download folder url is /Users/zakirhyder/Sites/rss-python/download
+2014-03-02 19:22:10,473 Method ftp
+2014-03-02 19:22:10,473 list index out of range
+2014-03-02 19:22:23,482 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:22:23,482 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:24:45,550 init
+2014-03-02 19:24:45,551 feed url is ftp://ftp.debian.org/debian/README.mirrors.txt
+2014-03-02 19:24:45,551 download folder url is /Users/zakirhyder/Sites/rss-python/download
+2014-03-02 19:24:45,551 Method ftp
+2014-03-02 19:24:45,551 username & password not provided. anonymous mode enabled
+2014-03-02 19:24:45,551 list index out of range
+2014-03-02 19:24:50,866 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss
+2014-03-02 19:24:50,866 file downloaded at /Users/zakirhyder/Sites/rss-python/download/ftpftpdebianorgdebianREADMEmirrorstxt.rss

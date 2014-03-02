@@ -70,9 +70,10 @@ class FtpDownload():
 		try:
 		  ftp_url_details = url_parsed.netloc.split('@')
 		except Exception as ex:
-			msg = '1ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss'
+			msg = 'ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss'
 			logger.info(msg)
 			logger.info(ex)
+			print msg
 			return msg
 
 		try:
@@ -81,7 +82,9 @@ class FtpDownload():
 		  ftp_pass = ftp_user_detail[1]
 		except Exception as ex:
 			msg = 'username & password not provided. anonymous mode enabled'
+			logger.info(msg)
 			logger.info(ex)
+			print msg
 
 		try:	
 		  ftp_path_array = url_parsed.path.split('/')
@@ -89,9 +92,10 @@ class FtpDownload():
 		  ftp_file_name = ftp_path_array[len(ftp_path_array) - 1]
 		  ftp_path = url_parsed.path.replace(ftp_file_name, '')
 		except Exception as ex:
-			msg = '3ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss'
+			msg = 'ftp url is not correct ftp://username:passowrd@ftp.website.com/downloads.rss'
 			logger.info(msg)
 			logger.info(ex)
+			print msg
 			return msg
 
 		try:
@@ -100,6 +104,7 @@ class FtpDownload():
 			msg = 'ftp username or passowrd or url is not correcr'
 			logger.info(msg)
 			logger.info(ex)
+			print msg
 			return msg
 
 		try:
@@ -108,10 +113,11 @@ class FtpDownload():
 			msg = 'file not found'
 			logger.info(msg)
 			logger.info(ex)
+			print msg
 			return msg	
 
 		local_filename = download_folder + '/' + filename  + '.rss'
-		download_file = open(local_filename,"w")
+		download_file = open(local_filename,"wb")
 		while file_size != download_file.tell():
 			try:
 				if download_file.tell() != 0:
@@ -119,12 +125,14 @@ class FtpDownload():
 				else:
 					link.retrbinary('RETR ' + ftp_file_name, download_file.write)
 			except Exception as ex:
-				msg = 'file could not be found'
+				msg = 'file not found'
 				logger.info(msg)
 				logger.info(ex)
+				print msg
 				return msg
 
 		msg = 'file downloaded at ' + local_filename
+		print msg
 		logger.info(msg)
 		return msg		
 
@@ -136,7 +144,9 @@ class Downloader:
 		if self.url_parsed.scheme in ['http', 'https']:
 			self.downloader = HttpDownload()
 		elif self.url_parsed.scheme in ['ftp']: 
-			self.downloader = FtpDownload()	
+			self.downloader = FtpDownload()
+		logger.info('Method ' + self.url_parsed.scheme)
+		
 
 	def safe_file_name(self):
 		return "".join(x for x in self.url if x.isalnum())
@@ -157,7 +167,7 @@ except getopt.GetoptError as e:
   print 'python downloader.py --feed=<RSS-Feed-URL> --output=<PATH-TO-DIRECTORY>'
   logger.info('argv error')
   sys.exit(1)
-
+  
 download_folder = os.getcwd() + '/download'
 	
 for opt, arg in opts:
@@ -165,6 +175,9 @@ for opt, arg in opts:
 		url = arg
 	elif opt in ('--output'):
 		download_folder = arg	
+
+logger.info('feed url is ' + url)
+logger.info('download folder url is ' + download_folder)
 
 if not os.path.exists(download_folder):
 	try:

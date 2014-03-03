@@ -8,6 +8,26 @@ import threading
 from urlparse import urlparse
 from ftplib import FTP
 
+queue = Queue.Queue()
+
+class ThreadUrl(threading.Thread):
+	"""Threaded Url Grab"""
+	def __init__(self, queue):
+	  threading.Thread.__init__(self)
+	  self.queue = queue
+
+	def run(self):
+	  while True:
+	    base = self.queue.get()
+	    msg = 'queue start for url ' + base.url
+	    logger.info(msg)
+	    print msg
+	    base.download(download_folder)
+	    msg = 'queue end for url ' + base.url
+	    logger.info(msg)
+	    print msg
+	    self.queue.task_done()
+
 class HttpDownload():
 	def download(self, url, url_parsed, filename, download_folder, logger):
 		download_file = download_folder + '/' + filename + '.rss'
@@ -181,7 +201,7 @@ logger.info('init')
 try:
   opts, args = getopt.getopt(sys.argv[1:],"feed:output:",["feed=","output="])
 except getopt.GetoptError as e:
-  print 'python downloader.py --feed=<RSS-Feed-URL> --output=<PATH-TO-DIRECTORY>'
+  print 'python downloader.py --feed=<RSS-Feed-URL>||<RSS-Feed-URL> --output=<PATH-TO-DIRECTORY>'
   logger.info('argv error')
   sys.exit(1)
   
@@ -189,11 +209,10 @@ download_folder = os.getcwd() + '/download'
 	
 for opt, arg in opts:
 	if opt in ('--feed'):
-		url = arg
+		urls = arg.split('-AH-')
 	elif opt in ('--output'):
 		download_folder = arg	
 
-logger.info('feed url is ' + url)
 logger.info('download folder url is ' + download_folder)
 
 if not os.path.exists(download_folder):
@@ -205,5 +224,16 @@ if not os.path.exists(download_folder):
 	  	print 'Can not create download folder ' + download_folder
 	  	sys.exit(1)
 
-base = Downloader(url, logger)
-base.download(download_folder)
+for i in range(5):
+	t = ThreadUrl(queue)
+	t.setDaemon(True)
+	t.start()
+  
+#populate queue with data   
+for url in urls:
+	if url != '':
+		base = Downloader(url, logger)
+		queue.put(base)
+
+#wait on the queue until everything has been processed     
+queue.join()

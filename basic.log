@@ -77,3 +77,6 @@
 2014-03-03 00:45:02,958 Method http
 2014-03-03 00:45:02,958 downloading from http://ftp.debian.org/debian/README
 2014-03-03 00:45:04,068 file already downloaded
+2014-03-03 10:45:03,338 init
+2014-03-03 10:45:03,360 feed url is http://ftp.debian.org/debian/README
+2014-03-03 10:45:03,360 download folder url is /Users/zakirhyder/Sites/rss-python/download

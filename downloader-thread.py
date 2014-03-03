@@ -3,6 +3,8 @@ import logging
 import sys
 import getopt
 import os
+import Queue
+import threading
 from urlparse import urlparse
 from ftplib import FTP
 
@@ -202,16 +204,6 @@ if not os.path.exists(download_folder):
 	  	logger.info('Can not create download folder ' + download_folder)
 	  	print 'Can not create download folder ' + download_folder
 	  	sys.exit(1)
-
-urls = [ 
-	'https://dl.dropboxusercontent.com/u/6160850/downloads.rss',
-	# 'https://dl.dropboxusercontent.com/u/6160850/downloads.rss',
-	]
-
-for url in urls:
-	print url
-exit(1) 	
-
 
 base = Downloader(url, logger)
 base.download(download_folder)

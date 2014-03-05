@@ -5,10 +5,14 @@ import getopt
 import os
 from urlparse import urlparse
 from ftplib import FTP
+from xml.dom.minidom import parseString
 
 class HttpDownload():
-	def download(self, url, url_parsed, filename, download_folder, logger):
-		download_file = download_folder + '/' + filename + '.rss'
+	def download(self, url, url_parsed, filename, download_folder, logger, download_file_name = ''):
+		if download_file_name == '':
+			download_file = download_folder + '/' + filename + '.rss'
+		else: 
+			download_file = download_folder + '/' + download_file_name
 		#sending a request to url 
 		try:
 			response = urllib2.urlopen(url)
@@ -72,7 +76,7 @@ class FtpDownload():
 		link.cwd(path)
 		return link	
 
-	def download(self, url, url_parsed, filename, download_folder, logger):
+	def download(self, url, url_parsed, filename, download_folder, logger, download_file_name = ''):
 		ftp_pass = ftp_user = ''
 		try:
 			#checking url
@@ -128,7 +132,12 @@ class FtpDownload():
 			print msg
 			return None	
 
-		local_filename = download_folder + '/' + filename  + '.rss'
+
+		if download_file_name == '':
+			local_filename = download_folder + '/' + filename  + '.rss'
+		else: 
+			local_filename = download_folder + '/' + download_file_name	
+
 		#checkeing file already downloaded or not
 		if os.path.isfile(local_filename):
 			if remote_file_size ==	os.path.getsize(local_filename):
@@ -189,10 +198,34 @@ class Downloader:
 	def safe_file_name(self):
 		return "".join(x for x in self.url if x.isalnum())
 
+	def safe_file_name_download(self, link):
+		return "".join(x for x in link if x.isalnum())	
+
 	def download(self, download_folder):
 		logger.info('downloading from ' + self.url)
 		#calling download function from downloader object
-		self.downloader.download(self.url, self.url_parsed, self.safe_file_name(), download_folder, self.logger)	
+		self.downloader.download(self.url, self.url_parsed, self.safe_file_name(), 
+			download_folder, self.logger)
+		download_file = download_folder + '/' + self.safe_file_name() + '.rss'
+
+		output_file = open(download_file,"r")
+		data = output_file.read()
+		output_file.close()
+		os.remove(download_file)
+		# print data
+		dom = parseString(data)
+		# print dom.getElementsByTagName('item')[0].toxml()
+		for item in dom.getElementsByTagName('item'):
+			download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
+			download_file_parsed = urlparse(download_file_link)
+			# print download_file_parsed
+			download_file_array = download_file_parsed.path.split('/')
+			download_file_name = download_file_array[len(download_file_array) - 1]
+			# print download_file_name
+			# exit(1)
+			self.downloader.download(download_file_link, download_file_parsed, self.safe_file_name_download(download_file_link), download_folder, self.logger, download_file_name)
+			# exit(1);			
+
 
 #intilizing logging
 logging.basicConfig(format='%(asctime)s %(message)s', filename='basic.log',level=logging.INFO)

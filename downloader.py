@@ -61,7 +61,10 @@ class HttpDownload():
 			output_file.write(data)
 		output_file.close()
 
-		msg = 'file downloaded at ' + download_file
+		if download_file_name == '':
+			msg = 'rss file downloaded at ' + download_file
+		else:
+			msg = 'file downloaded at ' + download_file	
 		print msg
 		logger.info(msg)
 
@@ -207,7 +210,6 @@ class Downloader:
 		self.downloader.download(self.url, self.url_parsed, self.safe_file_name(), 
 			download_folder, self.logger)
 		download_file = download_folder + '/' + self.safe_file_name() + '.rss'
-
 		output_file = open(download_file,"r")
 		data = output_file.read()
 		output_file.close()

@@ -221,10 +221,12 @@ class Downloader:
 			download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
 			download_file_parsed = urlparse(download_file_link)
 			# print download_file_parsed
-			download_file_array = download_file_parsed.path.split('/')
-			download_file_name = download_file_array[len(download_file_array) - 1]
+			# download_file_array = download_file_parsed.path.split('/')
+			# download_file_name = download_file_array[len(download_file_array) - 1]
 			# print download_file_name
 			# exit(1)
+			download_file_array = download_file_parsed.path.split('/')
+			download_file_name = item.getElementsByTagName('title')[0].childNodes[0].data
 			self.downloader.download(download_file_link, download_file_parsed, self.safe_file_name_download(download_file_link), download_folder, self.logger, download_file_name)
 			# exit(1);			
 

@@ -21,11 +21,11 @@ class ThreadUrl(threading.Thread):
 	  while True:
 	  	#retriving from Downloader object
 	    base = self.queue.get()
-	    msg = 'queue start for url ' + base.url
+	    msg = 'thread start for url ' + base.url
 	    logger.info(msg)
 	    print msg
 	    base.download(download_folder)
-	    msg = 'queue end for url ' + base.url
+	    msg = 'thread end for url ' + base.url
 	    logger.info(msg)
 	    print msg
 	    self.queue.task_done()
@@ -206,31 +206,8 @@ class FtpDownload():
 		print msg
 		logger.info(msg)
 
-class FileDownload():
-	def __init__(self, download_file_link, download_file_name, download_folder, logger, download_file_name):
-		self.logger = logger
-		self.download_file_link = download_file_link
-		self.download_file_name = download_file_name
-		self.download_folder = download_folder
-		self.download_file_parsed = urlparse(download_file_link)
-		#checking if the url scheme is http/https/ftp
-		if self.url_parsed.scheme in ['http', 'https']:
-			#creating HttpDownload object and setting it to downloader
-			self.downloader = HttpDownload()
-		elif self.url_parsed.scheme in ['ftp']:
-			#creating FtpDownload object and setting it to downloader 
-			self.downloader = FtpDownload()
-		logger.info('Method ' + self.url_parsed.scheme)
-
-		def safe_file_name_download(self, link):
-			return "".join(x for x in link if x.isalnum())
-
-		def download(self):
-			self.downloader.download(self.download_file_link, self.download_file_parsed, self.safe_file_name_download(download_file_link), download_folder, self.logger, download_file_name)
-
-
 class Downloader:
-	def __init__(self, url, logger):
+	def __init__(self, url, logger, filename = ''):
 		self.logger = logger
 		self.url = url
 		self.url_parsed = urlparse(url)
@@ -241,6 +218,7 @@ class Downloader:
 		elif self.url_parsed.scheme in ['ftp']:
 			#creating FtpDownload object and setting it to downloader 
 			self.downloader = FtpDownload()
+		self.download_filename = filename	
 		logger.info('Method ' + self.url_parsed.scheme)
 
 	#creating file name from url	
@@ -250,35 +228,14 @@ class Downloader:
 	def download(self, download_folder):
 		logger.info('downloading from ' + self.url)
 		#calling download function from downloader object
-		self.downloader.download(self.url, self.url_parsed, self.safe_file_name(), download_folder, self.logger)
-
-		download_file = download_folder + '/' + self.safe_file_name() + '.rss'
-		output_file = open(download_file,"r")
-		data = output_file.read()
-		output_file.close()
-		os.remove(download_file)
-		# print data
-		dom = parseString(data)
-		# print dom.getElementsByTagName('item')[0].toxml()
-		for item in dom.getElementsByTagName('item'):
-			download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
-			download_file_parsed = urlparse(download_file_link)
-			# print download_file_parsed
-			download_file_array = download_file_parsed.path.split('/')
-			download_file_name = download_file_array[len(download_file_array) - 1]
-			print download_file_name
-			# exit(1)
-			# def download(self, url, url_parsed, filename, download_folder, logger, download_file_name = ''):
-			# self.downloader.download(download_file_link, download_file_parsed, self.safe_file_name_download(download_file_link), download_folder, self.logger, download_file_name)
-			#createing some threads
-			for i in range(5):
-				t = ThreadUrl(queue)
-				t.setDaemon(True)
-				t.start()
-				base = Downloader(url, logger)
-				queue.put(base)
-			#wait on the queue until everything has been processed     
-			queue.join()
+		download_file_name = ''
+		if self.download_filename != '': 
+			download_file_name = self.download_filename	
+			file_name = download_file_name
+		else:
+			file_name = self.safe_file_name()	
+		self.downloader.download(self.url, self.url_parsed, file_name, download_folder, self.logger, download_file_name)
+		return file_name
 
 #intilizing logging
 logging.basicConfig(format='%(asctime)s %(message)s', filename='basic.log',level=logging.INFO)
@@ -319,8 +276,32 @@ if not os.path.exists(download_folder):
 			print 'Can not create download folder ' + download_folder
 			sys.exit(1)
 
-
 #create Downloader object with url and logger
 base = Downloader(url, logger)
 #calling download function 
-base.download(download_folder)
+file_name = base.download(download_folder)
+
+download_file = download_folder + '/' + file_name + '.rss'
+output_file = open(download_file,"r")
+data = output_file.read()
+output_file.close()
+os.remove(download_file)
+# print data
+# exit(1)
+dom = parseString(data)
+# print dom.getElementsByTagName('item')[0].toxml()
+for i in range(5):
+	t = ThreadUrl(queue)
+	t.setDaemon(True)
+	t.start()
+for item in dom.getElementsByTagName('item'):
+	download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
+	download_file_parsed = urlparse(download_file_link)
+	# print download_file_parsed
+	download_file_array = download_file_parsed.path.split('/')
+	download_file_name = item.getElementsByTagName('title')[0].childNodes[0].data
+
+	base = Downloader(download_file_link, logger, download_file_name)
+	queue.put(base)
+
+queue.join()	

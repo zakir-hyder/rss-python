@@ -286,11 +286,8 @@ output_file = open(download_file,"r")
 data = output_file.read()
 output_file.close()
 os.remove(download_file)
-# print data
-# exit(1)
 dom = parseString(data)
-# print dom.getElementsByTagName('item')[0].toxml()
-for i in range(5):
+for i in range(dom.getElementsByTagName("item").length):
 	t = ThreadUrl(queue)
 	t.setDaemon(True)
 	t.start()

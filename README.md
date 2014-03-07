@@ -7,7 +7,7 @@ if you ommit --output it will create folder name 'download' on current path
 ```    
 python downloader.py --feed=<RSS-Feed-URL>
 ```
-downloader-thread.py downloads 5 files simultaneously using 5 threads. The number of threads can be increased or decreased. First the Queue is instanced. Then it is fulled with 5 threads with ThreadUrl object. Then instance of Downloader with urls from RSS feed. Then threads start downloading the files.  
+downloader-thread.py downloads all the files in xml simultaneously using equal number of threads. The number of threads can be increased or decreased if wanted. The daemon threads calls ThreadUrl function which pop Downloader object from queue and calls download function to download the file. After finishing the downloading the file thread pop another Downloader object and so on. As the threads are daemon they will be killed as program quits  
 ```   
 downloader-thread.py --feed=<RSS-Feed-URL> --output=<PATH-TO-DIRECTORY>
 ```

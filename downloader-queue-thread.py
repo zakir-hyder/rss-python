@@ -13,23 +13,22 @@ queue = Queue.Queue()
 
 class ThreadUrl(threading.Thread):
 	"""Threaded Url Grab"""
-	def __init__(self, download_file_link, logger, download_file_name, download_folder):
+	def __init__(self, queue):
 	  threading.Thread.__init__(self)
-	  self.download_file_link = download_file_link
-	  self.logger = logger
-	  self.download_file_name = download_file_name
-	  self.download_folder = download_folder
+	  self.queue = queue
 
 	def run(self):
-		#retriving from Downloader object
-		msg = 'thread start for url ' + self.download_file_link
-		logger.info(msg)
-		print msg
-		base = Downloader(self.download_file_link, self.logger, self.download_file_name)
-		base.download(self.download_folder)
-		msg = 'thread end for url ' + self.download_file_link
-		logger.info(msg)
-		print msg
+	  while True:
+	  	#retriving from Downloader object
+	    base = self.queue.get()
+	    msg = 'thread start for url ' + base.url
+	    logger.info(msg)
+	    print msg
+	    base.download(download_folder)
+	    msg = 'thread end for url ' + base.url
+	    logger.info(msg)
+	    print msg
+	    self.queue.task_done()
 
 class HttpDownload():
 	def download(self, url, url_parsed, filename, download_folder, logger, download_file_name = ''):
@@ -56,7 +55,7 @@ class HttpDownload():
 		if os.path.isfile(download_file):
 			local_file_size = os.path.getsize(download_file)
 			if int(remote_file_size) ==	int(local_file_size):
-				msg = download_file_name + ' already downloaded'
+				msg = 'file already downloaded'
 				logger.info(msg)
 				print msg
 				return None
@@ -288,17 +287,18 @@ data = output_file.read()
 output_file.close()
 os.remove(download_file)
 dom = parseString(data)
-threads = []
+for i in range(10):
+	t = ThreadUrl(queue)
+	t.setDaemon(True)
+	t.start()
 for item in dom.getElementsByTagName('item'):
 	download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
 	download_file_parsed = urlparse(download_file_link)
-	print download_file_parsed
+	# print download_file_parsed
 	download_file_array = download_file_parsed.path.split('/')
 	download_file_name = item.getElementsByTagName('title')[0].childNodes[0].data
 
-	thread = ThreadUrl(download_file_link, logger, download_file_name, download_folder)	
-	thread.start()
-	threads.append(thread)
+	base = Downloader(download_file_link, logger, download_file_name)
+	queue.put(base)
 
-for t in threads:
-   t.join()
+queue.join()	

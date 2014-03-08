@@ -8,28 +8,72 @@ import threading
 from urlparse import urlparse
 from ftplib import FTP
 from xml.dom.minidom import parseString
+import httplib
+
+# def write(filename,data,offset):
+# 	try:
+# 		output_file = open(filename,"r+b")
+# 	except IOError:	
+# 		output_file = open(filename,"w+")
+# 	output_file.seek(offset)
+# 	output_file.write(data)
+# 	output_file.close()
+
+# filename = 'tempfile'
+# write(filename,'1' * (1024*32),1024*1024)
+# write(filename,'0' * (1024*32),0)
+# print os.path.getsize(filename)
+# exit(1)
 
 queue = Queue.Queue()
 
 class ThreadUrl(threading.Thread):
 	"""Threaded Url Grab"""
-	def __init__(self, download_file_link, logger, download_file_name, download_folder):
+	def __init__(self, queue):
 	  threading.Thread.__init__(self)
-	  self.download_file_link = download_file_link
-	  self.logger = logger
-	  self.download_file_name = download_file_name
-	  self.download_folder = download_folder
+	  self.queue = queue
 
 	def run(self):
-		#retriving from Downloader object
-		msg = 'thread start for url ' + self.download_file_link
-		logger.info(msg)
-		print msg
-		base = Downloader(self.download_file_link, self.logger, self.download_file_name)
-		base.download(self.download_folder)
-		msg = 'thread end for url ' + self.download_file_link
-		logger.info(msg)
-		print msg
+	  while True:
+	  	#retriving from Downloader object
+	    base = self.queue.get()
+	    msg = 'thread start for url ' + base.url
+	    logger.info(msg)
+	    print msg
+	    base.download(download_folder)
+	    msg = 'thread end for url ' + base.url
+	    logger.info(msg)
+	    print msg
+	    self.queue.task_done()
+
+class FetchUrl(threading.Thread):
+	"""Threaded Url Grab"""
+	def __init__(self, lock, url, filename, download_folder, logger, start_range, end_range):
+	  threading.Thread.__init__(self)
+	  self.lock = lock
+	  self.url = url
+	  self.url_parsed = urlparse(url)
+	  self.filename = filename
+	  self.download_folder = download_folder
+	  self.logger = logger
+	  self.start_range = start_range
+	  self.end_range = end_range
+
+	def run(self):
+		print "start download %s %s" % (self.start_range, self.end_range)
+		downloader = HttpDownload()
+		data = downloader.partial_download(self.url, self.url_parsed, self.logger, self.start_range, self.end_range)
+		download_file_name = self.download_folder + '/' + self.filename
+		self.lock.acquire()	
+		try:
+			output_file = open(download_file_name,"r+b")
+		except IOError:	
+			output_file = open(download_file_name,"w+")
+		print "file writeing"	
+		output_file.seek(self.start_range)
+		output_file.write(data)
+		output_file.close()
+		self.lock.release()
 
 class HttpDownload():
 	def download(self, url, url_parsed, filename, download_folder, logger, download_file_name = ''):
@@ -56,7 +100,7 @@ class HttpDownload():
 		if os.path.isfile(download_file):
 			local_file_size = os.path.getsize(download_file)
 			if int(remote_file_size) ==	int(local_file_size):
-				msg = download_file_name + ' already downloaded'
+				msg = 'file already downloaded'
 				logger.info(msg)
 				print msg
 				return None
@@ -91,7 +135,25 @@ class HttpDownload():
 			msg = 'file downloaded at ' + download_file	
 		print msg
 		logger.info(msg)
+	
+	def partial_download(self, url, url_parsed, logger, start_range = 0, end_range = 0):
+		req = urllib2.Request(url)
+		req.headers['Range'] = 'bytes=%s-%s' % (start_range, end_range)
 
+		try:
+			response = urllib2.urlopen(url)
+		except urllib2.URLError as e:
+			msg = 'url is not correct http://debian.org/debian/README'
+			logger.info(msg)
+			logger.info(e.reason)
+			print msg
+			return None
+		
+		msg = url + ' downloaded'
+		print msg
+		logger.info(msg)
+		return response.read()
+		
 class FtpDownload():
 	#connect to ftp. if user/password not given it will try to log anonymously 
 	def ftp_connect(self, host, password, user, path='/'):
@@ -288,17 +350,40 @@ data = output_file.read()
 output_file.close()
 os.remove(download_file)
 dom = parseString(data)
-threads = []
+for i in range(10):
+	t = ThreadUrl(queue)
+	t.setDaemon(True)
+	t.start()
 for item in dom.getElementsByTagName('item'):
 	download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
 	download_file_parsed = urlparse(download_file_link)
-	print download_file_parsed
+	# print download_file_parsed
 	download_file_array = download_file_parsed.path.split('/')
 	download_file_name = item.getElementsByTagName('title')[0].childNodes[0].data
+	port = 80
+	if download_file_parsed.scheme == 'ftp':
+		port = 21
+	conn = httplib.HTTPConnection(download_file_parsed.netloc, port)
+	conn.request("GET", download_file_parsed.path, headers={'Range': 'bytes=0-10'})
+	resp = conn.getresponse()
+	if resp.status <> 206:
+		# base = Downloader(download_file_link, logger, download_file_name)
+		# queue.put(base)
+		print '++++++++++++++++++'
+	else:
+		total_size = resp.getheader('content-range').split('/')[1]
+		start_range = 0
+		end_range = int(total_size)/2
 
-	thread = ThreadUrl(download_file_link, logger, download_file_name, download_folder)	
-	thread.start()
-	threads.append(thread)
-
-for t in threads:
-   t.join()
+		lock = threading.Lock()
+		thread = FetchUrl(lock, download_file_link, download_file_name, download_folder, logger, start_range, end_range)
+		thread.start()
+		thread.join()
+		start_range = start_range + 1
+		end_range = total_size
+		thread = FetchUrl(lock, download_file_link, download_file_name, download_folder, logger, start_range, end_range)
+		thread.start()
+		thread.join()
+		print '-----------------'	
+	# exit(1)	
+queue.join()	

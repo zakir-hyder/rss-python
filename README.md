@@ -15,7 +15,7 @@ downloader-thread.py downloads all the files in xml simultaneously. using equal 
 ```   
 python downloader-thread.py--feed=<RSS-Feed-URL> --output=<PATH-TO-DIRECTORY>
 ```
-downloader-multiple-thread.py sends a HTTPConnection request to check if the file is download using range header. It checks for 206 header response. If partial download possible the app create two threads - each thread downloads half of the file. Thread locks its self when it starts to write the file on HDD not while downloading. IF partial download is not possible the url is added to queue like downloader-queue-thread.py
+downloader-multiple-thread.py sends a request using HTTPConnection to each url to check if the file can be downloaded using range header. The program checks for 206 header response. If partial download possible the app create two threads - each thread downloads half of the file. Thread locks its self when it starts to write the file on HDD not while downloading. If partial download is not possible the url is added to queue like downloader-queue-thread.py
 ``` 
 python downloader-multiple-thread.py --feed=<RSS-Feed-URL> --output=<PATH-TO-DIRECTORY>
 ```

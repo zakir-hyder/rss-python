@@ -292,7 +292,7 @@ threads = []
 for item in dom.getElementsByTagName('item'):
 	download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
 	download_file_parsed = urlparse(download_file_link)
-	print download_file_parsed
+	# print download_file_parsed
 	download_file_array = download_file_parsed.path.split('/')
 	download_file_name = item.getElementsByTagName('title')[0].childNodes[0].data
 
@@ -300,5 +300,5 @@ for item in dom.getElementsByTagName('item'):
 	thread.start()
 	threads.append(thread)
 
-for t in threads:
-   t.join()
+for thread in threads:
+   thread.join()

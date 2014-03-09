@@ -10,21 +10,6 @@ from ftplib import FTP
 from xml.dom.minidom import parseString
 import httplib
 
-# def write(filename,data,offset):
-# 	try:
-# 		output_file = open(filename,"r+b")
-# 	except IOError:	
-# 		output_file = open(filename,"w+")
-# 	output_file.seek(offset)
-# 	output_file.write(data)
-# 	output_file.close()
-
-# filename = 'tempfile'
-# write(filename,'1' * (1024*32),1024*1024)
-# write(filename,'0' * (1024*32),0)
-# print os.path.getsize(filename)
-# exit(1)
-
 queue = Queue.Queue()
 
 class ThreadUrl(threading.Thread):
@@ -60,7 +45,9 @@ class FetchUrl(threading.Thread):
 	  self.end_range = end_range
 
 	def run(self):
-		print "start download %s %s" % (self.start_range, self.end_range)
+		msg = 'start partial download %s %s ' % (self.start_range, self.end_range)
+		self.logger.info(msg)
+		print msg
 		downloader = HttpDownload()
 		data = downloader.partial_download(self.url, self.url_parsed, self.logger, self.start_range, self.end_range)
 		download_file_name = self.download_folder + '/' + self.filename
@@ -69,7 +56,9 @@ class FetchUrl(threading.Thread):
 			output_file = open(download_file_name,"r+b")
 		except IOError:	
 			output_file = open(download_file_name,"w+")
-		print "file writeing"	
+		msg = 'start wrtiting partial document %s' % (self.filename)
+		self.logger.info(msg)
+		print msg
 		output_file.seek(self.start_range)
 		output_file.write(data)
 		output_file.close()
@@ -354,6 +343,7 @@ for i in range(10):
 	t = ThreadUrl(queue)
 	t.setDaemon(True)
 	t.start()
+threads = []	
 for item in dom.getElementsByTagName('item'):
 	download_file_link = item.getElementsByTagName('link')[0].childNodes[0].data
 	download_file_parsed = urlparse(download_file_link)
@@ -367,9 +357,8 @@ for item in dom.getElementsByTagName('item'):
 	conn.request("GET", download_file_parsed.path, headers={'Range': 'bytes=0-10'})
 	resp = conn.getresponse()
 	if resp.status <> 206:
-		# base = Downloader(download_file_link, logger, download_file_name)
-		# queue.put(base)
-		print '++++++++++++++++++'
+		base = Downloader(download_file_link, logger, download_file_name)
+		queue.put(base)
 	else:
 		total_size = resp.getheader('content-range').split('/')[1]
 		start_range = 0
@@ -378,12 +367,12 @@ for item in dom.getElementsByTagName('item'):
 		lock = threading.Lock()
 		thread = FetchUrl(lock, download_file_link, download_file_name, download_folder, logger, start_range, end_range)
 		thread.start()
-		thread.join()
+		threads.append(thread)
 		start_range = start_range + 1
 		end_range = total_size
 		thread = FetchUrl(lock, download_file_link, download_file_name, download_folder, logger, start_range, end_range)
 		thread.start()
-		thread.join()
-		print '-----------------'	
-	# exit(1)	
-queue.join()	
+		threads.append(thread)
+queue.join()
+for thread in threads:
+   thread.join()
